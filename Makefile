@@ -1,9 +1,10 @@
 CXX := g++
-CXXFLAGS := -std=c++11 -Wall -Wextra
+CXXFLAGS := -std=c++11 -Wall -Wextra -g
 
-COMMON_OBJS := Socket.o InetAddress.o util.o
-SERVER_OBJS := server.o Epoll.o $(COMMON_OBJS)
-CLIENT_OBJS := client.o $(COMMON_OBJS)
+SERVER_OBJS := server.o Epoll.o Channel.o Socket.o InetAddress.o util.o
+CLIENT_OBJS := client.o Socket.o InetAddress.o util.o
+
+DEPS := $(SERVER_OBJS:.o=.d) $(CLIENT_OBJS:.o=.d)
 
 .PHONY: all clean
 
@@ -16,14 +17,9 @@ client: $(CLIENT_OBJS)
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
 
-server.o: Epoll.h InetAddress.h Socket.h util.h
-client.o: InetAddress.h Socket.h
-Epoll.o: Epoll.h util.h
-Socket.o: Socket.h InetAddress.h util.h
-InetAddress.o: InetAddress.h
-util.o: util.h
+-include $(DEPS)
 
 clean:
-	rm -f server client *.o
+	$(RM) server client *.o *.d
