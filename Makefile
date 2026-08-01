@@ -1,25 +1,29 @@
 CXX := g++
-CXXFLAGS := -std=c++11 -Wall -Wextra -g
+CXXFLAGS := -std=c++11 -Wall -Wextra -g -Isrc
 
-SERVER_OBJS := server.o Epoll.o Channel.o Socket.o InetAddress.o util.o
-CLIENT_OBJS := client.o Socket.o InetAddress.o util.o
+SERVER_SRCS := server.cpp \
+               src/Server.cpp \
+               src/EventLoop.cpp \
+               src/Epoll.cpp \
+               src/Channel.cpp \
+               src/Socket.cpp \
+               src/InetAddress.cpp \
+               src/util.cpp
 
-DEPS := $(SERVER_OBJS:.o=.d) $(CLIENT_OBJS:.o=.d)
+CLIENT_SRCS := client.cpp \
+               src/Socket.cpp \
+               src/InetAddress.cpp \
+               src/util.cpp
 
 .PHONY: all clean
 
 all: server client
 
-server: $(SERVER_OBJS)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+server: $(SERVER_SRCS)
+	$(CXX) $(CXXFLAGS) $(SERVER_SRCS) -o server
 
-client: $(CLIENT_OBJS)
-	$(CXX) $(CXXFLAGS) $^ -o $@
-
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
-
--include $(DEPS)
+client: $(CLIENT_SRCS)
+	$(CXX) $(CXXFLAGS) $(CLIENT_SRCS) -o client
 
 clean:
-	$(RM) server client *.o *.d
+	$(RM) server client
