@@ -10,7 +10,8 @@ SERVER_SRCS := server.cpp \
                src/InetAddress.cpp \
                src/util.cpp \
                src/Acceptor.cpp \
-               src/Connection.cpp
+               src/Connection.cpp \
+               src/Buffer.cpp
 
 CLIENT_SRCS := client.cpp \
                src/Socket.cpp \
