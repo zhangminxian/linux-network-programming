@@ -8,7 +8,8 @@ SERVER_SRCS := server.cpp \
                src/Channel.cpp \
                src/Socket.cpp \
                src/InetAddress.cpp \
-               src/util.cpp
+               src/util.cpp \
+               src/Acceptor.cpp
 
 CLIENT_SRCS := client.cpp \
                src/Socket.cpp \

@@ -8,28 +8,21 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include "Acceptor.h"
 
 #define READ_BUFFER 1024
 
-Server::Server(EventLoop *_loop) : loop(_loop){    
-    //1.创建一个socket   ip地址类型  数据传输方式   协议
-    Socket *serv_sock = new Socket();
-    InetAddress *serv_addr = new InetAddress("127.0.0.1", 8888);
-    serv_sock->bind(serv_addr);
-    serv_sock->listen();
-    serv_sock->setnonblocking(); //设置为非阻塞socket
-
-    //创建一个Channel对象，将serv_sock的文件描述符和epoll对象传入 
-    Channel *servChannel = new Channel(loop, serv_sock->getFd());
-    //设置回调函数，使用std::bind绑定成员函数和参数
-    std::function<void()> cb = std::bind(&Server::newConnection, this, serv_sock);
-    servChannel->setCallback(cb);
-    servChannel->enableReading();
-
+Server::Server(EventLoop *_loop) : loop(_loop), acceptor(nullptr){ 
+    acceptor = new Acceptor(loop);
+    std::function<void(Socket*)> cb = std::bind(&Server::newConnection, this, std::placeholders::_1);
+    acceptor->setNewConnectionCallback(cb);
 }
 
 Server::~Server()
 {
+    delete acceptor;
     
 }
 // 处理读事件的回调函数
