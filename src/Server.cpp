@@ -11,6 +11,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include "Acceptor.h"
+#include "Connection.h"
 
 #define READ_BUFFER 1024
 
@@ -22,6 +23,9 @@ Server::Server(EventLoop *_loop) : loop(_loop), acceptor(nullptr){
 
 Server::~Server()
 {
+    for(auto &connection : connections){
+        delete connection.second;
+    }
     delete acceptor;
     
 }
@@ -49,14 +53,23 @@ void Server::handleReadEvent(int sockfd){
     }
 }
 
-void Server::newConnection(Socket *serv_sock){
-    //要接受一个客户端连接，需要使用accept函数 对于每一个客户端，在接受连接时也需要保存客户端的socket地址信息
-    InetAddress *clnt_addr = new InetAddress();      //会发生内存泄露！没有delete
-    Socket *clnt_sock = new Socket(serv_sock->accept(clnt_addr));       //会发生内存泄露！没有delete
-    printf("new client fd %d! IP: %s Port: %d\n", clnt_sock->getFd(), inet_ntoa(clnt_addr->addr.sin_addr), ntohs(clnt_addr->addr.sin_port));
-    clnt_sock->setnonblocking();
-    Channel *clntChannel = new Channel(loop, clnt_sock->getFd());
-    std::function<void()> cb = std::bind(&Server::handleReadEvent, this, clnt_sock->getFd());
-    clntChannel->setCallback(cb);
-    clntChannel->enableReading();
+void Server::newConnection(Socket *sock){
+    //当有新的客户端连接时，创建一个Connection对象，并将其保存到connections map中
+    Connection *conn = new Connection(loop, sock);
+    //设置回调函数，当客户端连接断开时，调用Server的deleteConnection方法删除对应的Connection对象
+    std::function<void(Socket*)> cb = std::bind(&Server::deleteConnection, this, std::placeholders::_1);
+    //设置回调函数，用于处理客户端连接断开时的操作
+    conn->setDeleteConnectionCallback(cb);
+    connections[sock->getFd()] = conn;
+}
+
+void Server::deleteConnection(Socket * sock){
+    //当客户端连接断开时，从connections map中删除对应的Connection对象，并释放内存
+    auto it = connections.find(sock->getFd());
+    if(it == connections.end()){
+        return;
+    }
+    Connection *conn = it->second;
+    connections.erase(it);
+    delete conn;
 }

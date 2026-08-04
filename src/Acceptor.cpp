@@ -3,6 +3,8 @@
 #include "InetAddress.h"
 #include "Channel.h"
 #include "Server.h"
+#include <arpa/inet.h>
+#include <stdio.h>
 
 Acceptor::Acceptor(EventLoop *_loop) : loop(_loop)
 {
@@ -26,7 +28,14 @@ Acceptor::~Acceptor(){
 
 void Acceptor::acceptConnection(){
     //接受一个客户端连接，需要使用accept函数 对于每一个客户端，在接受连接时也需要保存客户端的socket地址信息
-    newConnectionCallback(sock);
+    InetAddress *clnt_addr = new InetAddress();
+    Socket *clnt_sock = new Socket(sock->accept(clnt_addr));
+    clnt_sock->setnonblocking();
+    printf("new client fd %d! IP: %s Port: %d\n",
+           clnt_sock->getFd(), inet_ntoa(clnt_addr->addr.sin_addr),
+           ntohs(clnt_addr->addr.sin_port));
+    delete clnt_addr;
+    newConnectionCallback(clnt_sock);
 }
 
 void Acceptor::setNewConnectionCallback(std::function<void(Socket*)> _cb){
