@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 class Epoll;
 class Channel;
 // 处理事件循环的类
@@ -16,4 +17,6 @@ public:
     void loop();
     // 更新Channel的事件
     void updateChannel(Channel*);
+ 
+    void addThread(std::function<void()>);
 };

@@ -22,7 +22,7 @@ private:
     bool stop;
 public:
 
-    ThreadPool(int size = 10);
+    ThreadPool(int size = std::thread::hardware_concurrency());
     ~ThreadPool();
 
     //添加任务到线程池
@@ -39,7 +39,7 @@ auto ThreadPool::add(F&& f, Args&&... args) -> std::future<typename std::result_
 
     auto task = std::make_shared< std::packaged_task<return_type()> >(
             std::bind(std::forward<F>(f), std::forward<Args>(args)...)
-        );
+        );//创建一个共享指针，指向一个打包的任务，任务是一个可调用对象，返回类型是return_type
         
     std::future<return_type> res = task->get_future();
     {

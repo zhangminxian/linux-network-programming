@@ -9,22 +9,25 @@
 #include "Buffer.h"
 #include "util.h"
 #define READ_BUFFER 1024
-
-Connection::Connection(EventLoop *_loop, Socket *_sock) : loop(_loop), sock(_sock), channel(nullptr), inBuffer(new std::string()), readBuffer(nullptr){
-    channel = new Channel(loop, sock->getFd());
+//每一个客户端连接都对应一个Connection对象，Connection对象封装了客户端连接的socket、Channel、Buffer等信息
+Connection::Connection(EventLoop *_loop, Socket *_sock) : loop(_loop), sock(_sock), channel(nullptr), readBuffer(nullptr){
+    
+    channel = new Channel(loop, sock->getFd()); //connection对象创建时就创建一个channel对象，channel对象封装了客户端连接的socket文件描述符和事件信息
+    channel->enableRead(); //启用读事件
+    channel->useET(); //使用ET模式
     std::function<void()> cb = std::bind(&Connection::echo, this, sock->getFd());
-    channel->setCallback(cb);
-    channel->enableReading();
+    //设置回调函数，使用std::bind绑定成员函数和参数
+    channel->setReadCallback(cb);
     readBuffer = new Buffer();
 }
 
 Connection::~Connection(){
     delete channel;
     delete sock;
-    delete inBuffer;
     delete readBuffer;
 }
 
+//由于客户端 socket 是非阻塞的，全部数据读完后： read() == -1；errno == EAGAIN
 
 void Connection::echo(int sockfd){
     char buf[1024];     //这个buf大小无所谓
@@ -45,13 +48,28 @@ void Connection::echo(int sockfd){
         } else if(bytes_read == 0){  //EOF，客户端断开连接
             printf("EOF, client fd %d disconnected\n", sockfd);
             // close(sockfd);   //关闭socket会自动将文件描述符从epoll树上移除
-            deleteConnectionCallback(sock);
+            deleteConnectionCallback(sockfd);
             break;
         }
     }
 }
 
-void Connection::setDeleteConnectionCallback(std::function<void(Socket*)> _cb){
+void Connection::setDeleteConnectionCallback(std::function<void(int)> _cb){
     //设置回调函数，用于处理客户端连接断开时的操作
     deleteConnectionCallback = _cb;
+}
+// 发送数据给客户端
+void Connection::send(int sockfd){
+    char buf[readBuffer->size()];
+    strcpy(buf, readBuffer->c_str());
+    int  data_size = readBuffer->size(); 
+    int data_left = data_size; 
+    while (data_left > 0) 
+    { 
+        ssize_t bytes_write = write(sockfd, buf + data_size - data_left, data_left); 
+        if (bytes_write == -1 && errno == EAGAIN) { 
+            break;
+        }
+        data_left -= bytes_write; 
+    }
 }

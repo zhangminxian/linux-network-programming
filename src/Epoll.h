@@ -18,12 +18,17 @@ public:
     // 更新文件描述符在epoll中的监听事件
     void updateChannel(Channel*);
 
+    // 从epoll中删除文件描述符
+    void deleteChannel(Channel*);
+
+
     // //修改文件描述符在epoll中的监听事件
     // void modFd(int fd, uint32_t op);
     // //从epoll中删除文件描述符
     // void delFd(int fd); 
     
     //std::vector<epoll_event> poll(int timeout = -1);
+    //等待事件发生，返回就绪的Channel对象
     std::vector<Channel*> poll(int timeout = -1);
 
 };

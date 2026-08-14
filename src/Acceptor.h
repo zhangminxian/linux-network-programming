@@ -12,12 +12,12 @@ private:
     //Acceptor类的成员变量包括EventLoop对象、监听socket、监听地址和Channel对象
     EventLoop *loop;
     Socket *sock;
-    InetAddress *addr;
+    //Channel对象用于封装监听socket和事件的相关信息
     Channel *acceptChannel;
+    std::function<void(Socket*)> newConnectionCallback;
 public:
     Acceptor(EventLoop *_loop);
     ~Acceptor();
     void acceptConnection();
-    std::function<void(Socket*)> newConnectionCallback;
     void setNewConnectionCallback(std::function<void(Socket*)>);
 };

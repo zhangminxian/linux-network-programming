@@ -1,5 +1,5 @@
 CXX := g++
-CXXFLAGS := -std=c++11 -Wall -Wextra -g -Isrc
+CXXFLAGS := -std=c++11 -Wall -Wextra -g -pthread -Isrc
 
 SERVER_SRCS := server.cpp \
                src/Server.cpp \
@@ -11,12 +11,14 @@ SERVER_SRCS := server.cpp \
                src/util.cpp \
                src/Acceptor.cpp \
                src/Connection.cpp \
-               src/Buffer.cpp
+               src/Buffer.cpp \
+               src/ThreadPool.cpp
 
 CLIENT_SRCS := client.cpp \
                src/Socket.cpp \
                src/InetAddress.cpp \
-               src/util.cpp
+               src/util.cpp \
+               src/Buffer.cpp
 
 .PHONY: all clean
 

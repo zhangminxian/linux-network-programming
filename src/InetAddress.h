@@ -3,10 +3,10 @@
 
 class InetAddress
 {
-public:
+private:
     //首先创建一个结构体sockaddr_in并初始化
     struct sockaddr_in addr;
-    socklen_t addr_len;
+public:
 
     InetAddress();
     
@@ -14,4 +14,10 @@ public:
     InetAddress(const char* ip, uint16_t port);
 
     ~InetAddress();
+    void setInetAddr(sockaddr_in _addr);
+    sockaddr_in getAddr();
+    char* getIp();
+    uint16_t getPort();
+
+
 };

@@ -14,8 +14,7 @@ private:
     Socket *sock;
     Channel *channel;
     //回调函数，用于处理客户端连接断开时的操作
-    std::function<void(Socket*)> deleteConnectionCallback;
-    std::string *inBuffer;
+    std::function<void(int)> deleteConnectionCallback;
     Buffer *readBuffer;
 public:
     Connection(EventLoop *_loop, Socket *_sock);
@@ -23,5 +22,7 @@ public:
     //处理客户端连接的读写事件
     void echo(int sockfd);
     //设置回调函数，用于处理客户端连接断开时的操作
-    void setDeleteConnectionCallback(std::function<void(Socket*)>);
+    void setDeleteConnectionCallback(std::function<void(int)>);
+    void send(int sockfd);
+    
 };
