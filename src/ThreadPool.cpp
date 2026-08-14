@@ -42,17 +42,17 @@ ThreadPool::~ThreadPool(){
             th.join();
     }
 }
-//添加任务到线程池
-void ThreadPool::add(std::function<void()> func){
-    {
-        //加锁，防止多个线程同时访问任务队列
-        std::unique_lock<std::mutex> lock(tasks_mtx);
-        //如果线程池已经停止，则抛出异常
-        if(stop)
-            throw std::runtime_error("ThreadPool already stop, can't add task any more");
-        //将任务添加到任务队列中
-        tasks.emplace(func);
-    }
-    //通知一个线程有新任务到来
-    cv.notify_one();
-}
+// //添加任务到线程池
+// void ThreadPool::add(std::function<void()> func){
+//     {
+//         //加锁，防止多个线程同时访问任务队列
+//         std::unique_lock<std::mutex> lock(tasks_mtx);
+//         //如果线程池已经停止，则抛出异常
+//         if(stop)
+//             throw std::runtime_error("ThreadPool already stop, can't add task any more");
+//         //将任务添加到任务队列中
+//         tasks.emplace(func);
+//     }
+//     //通知一个线程有新任务到来
+//     cv.notify_one();
+// }
