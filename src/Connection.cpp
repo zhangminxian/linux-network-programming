@@ -101,12 +101,12 @@ Buffer *Connection::GetSendBuffer() { return send_buffer_; }
 const char *Connection::SendBuffer() { return send_buffer_->c_str(); }
 
 void Connection::SetDeleteConnectionCallback(std::function<void(Socket *)> const &callback) {
-  delete_connectioin_callback_ = callback;
+    delete_connectioin_callback_ = callback;
 }
 
 void Connection::SetOnConnectCallback(std::function<void(Connection *)> const &callback) {
-  on_connect_callback_ = callback;
-  channel_->setReadCallback([this]() { on_connect_callback_(this); });
+    on_connect_callback_ = callback;
+    channel_->setReadCallback([this]() { on_connect_callback_(this); });
 }
 
 void Connection::GetlineSendBuffer() { send_buffer_->getline(); }

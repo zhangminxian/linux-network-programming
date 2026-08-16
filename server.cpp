@@ -6,8 +6,9 @@
 #include <iostream>
 
 int main() {
-
+    // 创建事件循环对象和服务器对象
     EventLoop *loop = new EventLoop();
+    // 创建服务器对象，传入事件循环对象
     Server *server = new Server(loop);
     // 设置连接回调函数，当有新的连接时，会调用这个回调函数
     server->OnConnect([](Connection *conn) {
