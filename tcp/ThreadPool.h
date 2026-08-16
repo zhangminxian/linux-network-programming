@@ -1,3 +1,7 @@
+/******************************
+线程池的实现
+******************************/
+
 #pragma once
 #include <functional>
 #include <vector>
@@ -6,47 +10,46 @@
 #include <mutex>
 #include <condition_variable>
 #include <future>
-//线程池类
+#include "common.h"
+
 class ThreadPool
 {
 private:
-    //线程池大小
     std::vector<std::thread> threads;
-    //任务队列
     std::queue<std::function<void()>> tasks;
-    //任务队列互斥锁
     std::mutex tasks_mtx;
-    //条件变量
     std::condition_variable cv;
-    //停止标志
-    bool stop;
-public:
+    std::atomic<bool> stop_{false};
 
+public:
     ThreadPool(int size = std::thread::hardware_concurrency());
     ~ThreadPool();
 
-    //添加任务到线程池
-    //void add(std::function<void()>);
+    // void add(std::function<void()>);
     template<class F, class... Args>
-    auto add(F&& f, Args&&... args) 
+    auto Add(F&& f, Args&&... args) 
     -> std::future<typename std::result_of<F(Args...)>::type>;
 
 };
-//不能放在cpp文件，原因是C++编译器不支持模版的分离编译
+
+
+//不能放在cpp文件，C++编译器不支持模版的分离编译
 template<class F, class... Args>
-auto ThreadPool::add(F&& f, Args&&... args) -> std::future<typename std::result_of<F(Args...)>::type> {
+auto ThreadPool::Add(F&& f, Args&&... args) 
+    -> std::future<typename std::result_of<F(Args...)>::type>
+{
     using return_type = typename std::result_of<F(Args...)>::type;
 
     auto task = std::make_shared< std::packaged_task<return_type()> >(
             std::bind(std::forward<F>(f), std::forward<Args>(args)...)
-        );//创建一个共享指针，指向一个打包的任务，任务是一个可调用对象，返回类型是return_type
+        );
         
     std::future<return_type> res = task->get_future();
     {
         std::unique_lock<std::mutex> lock(tasks_mtx);
 
         // don't allow enqueueing after stopping the pool
-        if(stop)
+        if(stop_)
             throw std::runtime_error("enqueue on stopped ThreadPool");
 
         tasks.emplace([task](){ (*task)(); });

@@ -1,34 +1,13 @@
-CXX := g++
-CXXFLAGS := -std=c++11 -Wall -Wextra -g -pthread -Isrc
+TCP=$(wildcard tcp/*.cpp)
 
-SERVER_SRCS := server.cpp \
-               src/Server.cpp \
-               src/EventLoop.cpp \
-               src/Epoll.cpp \
-               src/Channel.cpp \
-               src/Socket.cpp \
-               src/InetAddress.cpp \
-               src/util.cpp \
-               src/Acceptor.cpp \
-               src/Connection.cpp \
-               src/Buffer.cpp \
-               src/ThreadPool.cpp
-
-CLIENT_SRCS := client.cpp \
-               src/Socket.cpp \
-               src/InetAddress.cpp \
-               src/util.cpp \
-               src/Buffer.cpp
-
-.PHONY: all clean
-
-all: server client
-
-server: $(SERVER_SRCS)
-	$(CXX) $(CXXFLAGS) $(SERVER_SRCS) -o server
-
-client: $(CLIENT_SRCS)
-	$(CXX) $(CXXFLAGS) $(CLIENT_SRCS) -o client
+server:
+	g++ -std=c++14 -pthread -g \
+	$(TCP) \
+	echo_server.cpp \
+	-o server
+	
+th:
+	g++ -pthread src/ThreadPool.cpp ThreadPoolTest.cpp -o ThreadPoolTest
 
 clean:
-	$(RM) server client
+	rm server 
