@@ -14,7 +14,8 @@ private:
     Socket *sock;
     //Channel对象用于封装监听socket和事件的相关信息
     Channel *acceptChannel;
-    std::function<void(Socket*)> newConnectionCallback;
+    //回调函数用于处理新的连接请求，参数为新连接的Socket对象
+    std::function<void(Socket*)> newConnectionCallback; 
 public:
     Acceptor(EventLoop *_loop);
     ~Acceptor();
