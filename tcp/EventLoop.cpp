@@ -3,7 +3,10 @@
 #include "Channel.h"
 #include "Epoller.h"
 
-EventLoop::EventLoop() { poller_ = std::make_unique<Epoller>(); }
+EventLoop::EventLoop() { 
+    // 创建Epoller对象，并将其赋值给智能指针poller_
+    poller_ = std::make_unique<Epoller>(); 
+}
 
 EventLoop::~EventLoop() {}
 

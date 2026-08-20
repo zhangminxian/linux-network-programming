@@ -15,10 +15,12 @@
 #include <iostream>
 
 Acceptor::Acceptor(EventLoop *loop, const char * ip, const int port) :loop_(loop), listenfd_(-1){
-    Create();
-    Bind(ip, port);
-    Listen();
-    channel_ = std::make_unique<Channel>(listenfd_, loop);
+    Create(); // 创建socket
+    Bind(ip, port); // 绑定ip和端口
+    Listen(); // 监听socket
+    // 创建Channel对象，并将其与EventLoop关联
+    channel_ = std::make_unique<Channel>(listenfd_, loop); 
+    // 设置Channel的读事件回调函数为Acceptor::AcceptConnection
     std::function<void()> cb = std::bind(&Acceptor::AcceptConnection, this);
     channel_->set_read_callback(cb);
     channel_->EnableRead();
@@ -57,10 +59,10 @@ void Acceptor::Listen(){
 }
 
 void Acceptor::AcceptConnection(){
-    struct sockaddr_in client;
-    socklen_t client_addrlength = sizeof(client);
+    struct sockaddr_in client; // 客户端地址结构体
+    socklen_t client_addrlength = sizeof(client); // 客户端地址长度
     assert(listenfd_ != -1);
-
+    // 接收连接，返回客户端的文件描述符
     int clnt_fd = ::accept4(listenfd_, (struct sockaddr *)&client, &client_addrlength, SOCK_NONBLOCK | SOCK_CLOEXEC);
     
     if (clnt_fd == -1){

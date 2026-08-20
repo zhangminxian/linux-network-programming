@@ -9,8 +9,10 @@
 #define MAX_EVENTS 1000
 
 Epoller::Epoller(){
+    // 创建epoll文件描述符，并分配events_数组空间
     fd_ = epoll_create1(0);
     events_ = new epoll_event[MAX_EVENTS];
+    // 初始化events_数组为0
     memset(events_, 0, sizeof(*events_) * MAX_EVENTS);
 }
 
@@ -24,6 +26,7 @@ Epoller::~Epoller(){
 
 std::vector<Channel *> Epoller::Poll(long timeout) const{
     std::vector<Channel *> active_channels;
+    // 调用epoll_wait等待事件发生，返回就绪的文件描述符数量
     int nfds = epoll_wait(fd_, events_, MAX_EVENTS, timeout);
     if(nfds == -1){ perror("epoll wait error"); }
     for (int i = 0; i < nfds; ++i){

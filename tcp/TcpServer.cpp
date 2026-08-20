@@ -11,8 +11,9 @@
 
 
 TcpServer::TcpServer(const char * ip, const int port): next_conn_id_(1){
-    main_reactor_ = std::make_unique<EventLoop>();
-    acceptor_ = std::make_unique<Acceptor>(main_reactor_.get(), ip, port);
+    main_reactor_ = std::make_unique<EventLoop>(); // 初始化主事件循环
+    acceptor_ = std::make_unique<Acceptor>(main_reactor_.get(), ip, port); // 初始化Acceptor对象，传入主事件循环和监听的IP地址及端口号
+    // 设置新连接的回调函数，当有新的连接到来时，会调用TcpServer::HandleNewConnection方法
     std::function<void(int)> cb = std::bind(&TcpServer::HandleNewConnection, this, std::placeholders::_1);
     acceptor_->set_newconnection_callback(cb);
 

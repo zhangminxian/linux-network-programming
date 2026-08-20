@@ -15,14 +15,14 @@
 class ThreadPool
 {
 private:
-    std::vector<std::thread> threads;
-    std::queue<std::function<void()>> tasks;
-    std::mutex tasks_mtx;
-    std::condition_variable cv;
-    std::atomic<bool> stop_{false};
+    std::vector<std::thread> threads; // 线程池中的线程
+    std::queue<std::function<void()>> tasks; // 任务队列，存放待执行的任务
+    std::mutex tasks_mtx; // 互斥锁，用于保护任务队列的访问
+    std::condition_variable cv; // 条件变量，用于线程间的同步
+    std::atomic<bool> stop_{false}; // 标志位，表示线程池是否停止运行 
 
 public:
-    ThreadPool(int size = std::thread::hardware_concurrency());
+    ThreadPool(int size = std::thread::hardware_concurrency());// 构造函数，初始化线程池，默认线程数为硬件并发数
     ~ThreadPool();
 
     // void add(std::function<void()>);

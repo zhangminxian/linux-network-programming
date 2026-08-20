@@ -12,10 +12,11 @@ class Buffer;
 class ThreadPool;
 
 // Macros to disable copying and moving
+// 禁止拷贝和移动 //myclass a(b)不能用 a=b 不能用
 #define DISALLOW_COPY(cname)     \
-  cname(const cname &) = delete; \
+  cname(const cname &) = delete; \             
   cname &operator=(const cname &) = delete;
-
+// 某个类禁止拷贝和移动  //myclass a=std::move(b) 不能用 ， a=std::move(b) 不能用
 #define DISALLOW_MOVE(cname) \
   cname(cname &&) = delete;  \
   cname &operator=(cname &&) = delete;

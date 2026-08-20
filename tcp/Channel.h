@@ -9,6 +9,7 @@ class EventLoop;
 class Channel {
     public:
         DISALLOW_COPY_AND_MOVE(Channel);
+        // Channel类是对socket的封装，封装了socket的fd，监听的事件，准备好的事件，以及回调函数
         Channel(int fd, EventLoop * loop);
         
         ~Channel();
@@ -17,7 +18,7 @@ class Channel {
         void EnableRead();  // 允许读
         void EnableWrite(); // 允许写
         void EnableET(); // 以ET形式触发
-        void DisableWrite();
+        void DisableWrite(); // 禁止写
 
         int fd() const;  // 获取fd
         short listen_events() const; // 监听的事件
@@ -29,7 +30,7 @@ class Channel {
 
         void SetReadyEvents(int ev);
         void set_read_callback(std::function<void()> const &callback);// 设置回调函数
-        void set_write_callback(std::function<void()> const &callback);
+        void set_write_callback(std::function<void()> const &callback); // 设置回调函数
 
     private:
         int fd_;

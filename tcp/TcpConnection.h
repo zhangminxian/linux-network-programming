@@ -8,16 +8,17 @@ class Buffer;
 class TcpConnection
 {
 public:
+
+    // 连接状态
     enum ConnectionState
     {
-        Invalid = 1,
-        Connected,
-        Disconected
+        Invalid = 1, // 无效状态
+        Connected,   // 已连接状态
+        Disconected  // 未连接状态
     };
 
     DISALLOW_COPY_AND_MOVE(TcpConnection);
 
-    
     TcpConnection(EventLoop *loop, int connfd, int connid);
     ~TcpConnection();
 
@@ -29,8 +30,8 @@ public:
 
     // 设定send buf
     void set_send_buf(const char *str); 
-    Buffer *read_buf();
-    Buffer *send_buf();
+    Buffer *read_buf(); // 读缓冲区
+    Buffer *send_buf(); // 写缓冲区
 
     void Read(); // 读操作
     void Write(); // 写操作
@@ -53,6 +54,7 @@ public:
 private:
     // 该连接绑定的Socket
     int connfd_;
+    // 该连接的id
     int connid_;
     // 连接状态
     ConnectionState state_;
@@ -66,6 +68,6 @@ private:
     std::function<void(int)> on_close_;
     std::function<void(TcpConnection *)> on_message_;
 
-    void ReadNonBlocking();
-    void WriteNonBlocking();
+    void ReadNonBlocking(); // 非阻塞读取
+    void WriteNonBlocking(); // 非阻塞写入
 };

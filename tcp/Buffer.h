@@ -6,6 +6,7 @@
 
 class Buffer{
     public:
+
         DISALLOW_COPY_AND_MOVE(Buffer);
         Buffer() = default;
         ~Buffer() = default;

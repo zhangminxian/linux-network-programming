@@ -22,6 +22,8 @@ public:
     std::vector<Channel *> Poll(long timeout = -1) const;
 
     private:
+        // epoll文件描述符
         int fd_;
+        // epoll_event数组，存放epoll_wait返回的事件
         struct epoll_event *events_;
 };

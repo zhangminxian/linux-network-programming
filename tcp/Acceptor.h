@@ -10,9 +10,10 @@ class Channel;
 class Acceptor{
     public:
         DISALLOW_COPY_AND_MOVE(Acceptor);
+        // Acceptor类是对socket的封装，封装了socket的fd，监听的事件，以及回调函数
         Acceptor(EventLoop *loop, const char * ip, const int port);
         ~Acceptor();
-
+        // 设置新连接的回调函数
         void set_newconnection_callback(std::function<void(int)> const &callback);
         
         // 创建socket
